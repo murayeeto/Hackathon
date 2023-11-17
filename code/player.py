@@ -127,6 +127,9 @@ class Player(pygame.sprite.Sprite):
 		self.direction.y += self.gravity
 		self.collision_rect.y += self.direction.y
 
+	def change_gravity(self, gravity):
+		self.gravity = gravity
+
 	def jump(self):
 		self.direction.y = self.jump_speed
 		self.jump_sound.play()

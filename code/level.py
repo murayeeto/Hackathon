@@ -30,6 +30,7 @@ class Level:
 		self.player = pygame.sprite.GroupSingle()
 		self.goal = pygame.sprite.GroupSingle()
 		self.player_setup(player_layout,change_health)
+		
 
 		# user interface 
 		self.change_coins = change_coins
@@ -162,9 +163,15 @@ class Level:
 					player.collision_rect.right = sprite.rect.left
 					player.on_right = True
 					self.current_x = player.rect.right
-
+    
 	def vertical_movement_collision(self):
+
 		player = self.player.sprite
+		if self.current_level == 0:
+			player.change_gravity(.8)
+		elif self.current_level == 1:
+			player.change_gravity(.5)
+		
 		player.apply_gravity()
 		collidable_sprites = self.terrain_sprites.sprites() + self.crate_sprites.sprites() + self.fg_palm_sprites.sprites()
 
