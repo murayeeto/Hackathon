@@ -234,7 +234,7 @@ class Level:
 			if self.current_level == 5:
 				self.world_shift = -11
 			else:
-				self.world_shift = -8
+				self.world_shift  = -8
 			player.speed = 0
 		else:
 			if self.current_level == 5:
