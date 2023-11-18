@@ -2,17 +2,21 @@ from csv import reader
 from settings import tile_size
 from os import walk
 import pygame
+from os.path import join
 
 def import_folder(path):
-	surface_list = []
+    surface_list = []
 
-	for _,__,image_files in walk(path):
-		for image in image_files:
-			full_path = path + '/' + image
-			image_surf = pygame.image.load(full_path).convert_alpha()
-			surface_list.append(image_surf)
+    for _, __, image_files in walk(path):
+        for image in image_files:
+            full_path = join(path, image)
+            try:
+                image_surf = pygame.image.load(full_path).convert_alpha()
+                surface_list.append(image_surf)
+            except pygame.error as e:
+                print(f"Error loading image: {e}")
 
-	return surface_list
+    return surface_list
 
 def import_csv_layout(path):
 	terrain_map = []

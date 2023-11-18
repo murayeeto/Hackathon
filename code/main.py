@@ -56,20 +56,75 @@ class Game:
 			self.level_bg_music.stop()
 			self.overworld_bg_music.play(loops = -1)
 
+	def run_title_screen(self):
+
+		title_screen_image = pygame.image.load('../title.png') 
+		title_screen_rect = title_screen_image.get_rect(center=(screen_width // 2, screen_height // 2))
+
+
+		animation_frames = [pygame.image.load(f'../titleanim/{i}.png') for i in range(1, 23)] 
+
+
+		for frame in animation_frames:
+			screen.blit(frame, title_screen_rect)
+			pygame.display.flip()
+			pygame.time.delay(30) 
+
+
+		screen.blit(title_screen_image, title_screen_rect)
+
+
+		press_space_font = pygame.font.Font(None, 50)
+		title_text = press_space_font.render("Space Squad", True, (255, 0, 0))
+		press_space_text = press_space_font.render("Press SPACE to Start", True, (255, 0, 0))
+		press_space_rect = press_space_text.get_rect(center=(screen_width // 2, screen_height * 2 // 3))
+		title_rect = press_space_text.get_rect(center=(screen_width / 1.75, screen_height / 3.5))
+
+		screen.blit(press_space_text, press_space_rect)
+		screen.blit(title_text, title_rect)
+
+		pygame.display.flip()
+
+
+		waiting_for_key = True
+		while waiting_for_key:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					sys.exit()
+				elif event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_SPACE:
+						waiting_for_key = False
+
+
+		pygame.time.delay(1000)
+
+		# Transition to the overworld
+		self.status = 'overworld'
+		self.overworld_bg_music.play(loops=-1)
+
 	def run(self):
-		if self.status == 'overworld':
-			self.overworld.run()
-		else:
-			self.level.run()
-			self.ui.show_health(self.cur_health,self.max_health)
-			self.ui.show_coins(self.coins)
-			self.check_game_over()
+				if self.status == 'title':
+					self.run_title_screen()
+					self.status = 'overworld'
+					self.overworld_bg_music.play(loops=-1)
+
+				elif self.status == 'overworld':
+					self.overworld.run()
+
+				else:
+					self.level.run()
+					self.ui.show_health(self.cur_health, self.max_health)
+					self.ui.show_coins(self.coins)
+					self.check_game_over()
+
 
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((screen_width,screen_height))
 clock = pygame.time.Clock()
 game = Game()
+game.run_title_screen()
 
 while True:
 	for event in pygame.event.get():

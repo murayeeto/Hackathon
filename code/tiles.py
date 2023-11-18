@@ -10,6 +10,17 @@ class Tile(pygame.sprite.Sprite):
 	def update(self,shift):
 		self.rect.x += shift
 
+class TextTile(Tile):
+    def __init__(self, size, x, y, text):
+        super().__init__(size, x, y)
+        self.text = text
+        self.font = pygame.font.Font(None, 36)  # Adjust the font as needed
+
+    def draw_text(self, screen):
+        text_surface = self.font.render(self.text, True, (255, 255, 255))  # Adjust color as needed
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        screen.blit(text_surface, text_rect)
+
 class StaticTile(Tile):
 	def __init__(self,size,x,y,surface):
 		super().__init__(size,x,y)

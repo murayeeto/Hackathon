@@ -15,6 +15,10 @@ class Level:
 		self.world_shift = 0
 		self.current_x = None
 
+		#clock for level 1
+		self.clock = pygame.time.Clock()
+		self.elapsed_time = 0
+
 		# audio 
 		self.coin_sound = pygame.mixer.Sound('../audio/effects/coin.wav')
 		self.stomp_sound = pygame.mixer.Sound('../audio/effects/stomp.wav')
@@ -30,6 +34,10 @@ class Level:
 		self.player = pygame.sprite.GroupSingle()
 		self.goal = pygame.sprite.GroupSingle()
 		self.player_setup(player_layout,change_health)
+
+
+
+
 		
 
 		# user interface 
@@ -75,10 +83,18 @@ class Level:
 		self.constraint_sprites = self.create_tile_group(constraint_layout,'constraint')
 
 		# decoration 
-		self.sky = Sky(8)
+		self.sky = self.setup_sky()
 		level_width = len(terrain_layout[0]) * tile_size
 		self.water = Water(screen_height - 20,level_width)
 		self.clouds = Clouds(400,level_width,30)
+
+	def setup_sky(self):
+			if self.current_level == 0:
+				return Sky(8, '../graphics/decoration/sky/Earth.png')
+			elif self.current_level == 1:
+				return Sky(8, '../graphics/decoration/sky/Venus.png')
+			elif self.current_level == 2:
+				return Sky(8, '../graphics/decoration/sky/Mars.png')
 
 	def create_tile_group(self,layout,type):
 		sprite_group = pygame.sprite.Group()
@@ -90,7 +106,15 @@ class Level:
 					y = row_index * tile_size
 
 					if type == 'terrain':
-						terrain_tile_list = import_cut_graphics('../graphics/terrain/terrain_tiles.png')
+						if self.current_level == 0:
+							terrain_tile_list = import_cut_graphics('../graphics/terrain/terrain_tiles.png')
+						elif self.current_level == 1:
+							terrain_tile_list = import_cut_graphics('../graphics/terrain/tiles2.png')
+						elif self.current_level == 2:
+							terrain_tile_list = import_cut_graphics('../graphics/terrain/tiles3.png')
+						elif self.current_level == 3:
+							terrain_tile_list = import_cut_graphics('../graphics/terrain/tiles3.png')					
+
 						tile_surface = terrain_tile_list[int(val)]
 						sprite = StaticTile(tile_size,x,y,tile_surface)
 						
@@ -156,21 +180,27 @@ class Level:
 		for sprite in collidable_sprites:
 			if sprite.rect.colliderect(player.collision_rect):
 				if player.direction.x < 0: 
-					player.collision_rect.left = sprite.rect.right
-					player.on_left = True
-					self.current_x = player.rect.left
+						player.collision_rect.left = sprite.rect.right
+						player.on_left = True
+						self.current_x = player.rect.left
+						self.onwall = True
 				elif player.direction.x > 0:
-					player.collision_rect.right = sprite.rect.left
-					player.on_right = True
-					self.current_x = player.rect.right
+						player.collision_rect.right = sprite.rect.left
+						player.on_right = True
+						self.current_x = player.rect.right
+						self.onwall = True
     
 	def vertical_movement_collision(self):
 
 		player = self.player.sprite
-		if self.current_level == 0:
+		if self.current_level == 0 or self.current_level == 1 or self.current_level == 6:
 			player.change_gravity(.8)
-		elif self.current_level == 1:
+		elif self.current_level == 2 or self.current_level == 3:
 			player.change_gravity(.5)
+		elif self.current_level == 4:
+			player.change_gravity(1.6)
+		elif self.current_level == 5 or self.curent_level == 6:
+			player.change_gravity(.85)
 		
 		player.apply_gravity()
 		collidable_sprites = self.terrain_sprites.sprites() + self.crate_sprites.sprites() + self.fg_palm_sprites.sprites()
@@ -195,14 +225,24 @@ class Level:
 		direction_x = player.direction.x
 
 		if player_x < screen_width / 4 and direction_x < 0:
-			self.world_shift = 8
+			if self.current_level == 5:
+				self.world_shift = 11
+			else:
+				self.world_shift = 8
 			player.speed = 0
 		elif player_x > screen_width - (screen_width / 4) and direction_x > 0:
-			self.world_shift = -8
+			if self.current_level == 5:
+				self.world_shift = -11
+			else:
+				self.world_shift = -8
 			player.speed = 0
 		else:
+			if self.current_level == 5:
+				player.speed = 11
+			else:
+				player.speed = 8
 			self.world_shift = 0
-			player.speed = 8
+			
 
 	def get_player_on_ground(self):
 		if self.player.sprite.on_ground:
@@ -225,7 +265,23 @@ class Level:
 			
 	def check_win(self):
 		if pygame.sprite.spritecollide(self.player.sprite,self.goal,False):
-			self.create_overworld(self.current_level,self.new_max_level)
+			self.display_planet_text(self.current_level)
+
+			pygame.time.delay(3000)
+
+			self.create_overworld(self.current_level, self.new_max_level)
+
+	def display_planet_text(self,curlevel):
+		font = pygame.font.Font(None, 36)
+		if curlevel == 0:
+			text_surface = font.render("We're the third rock from the sun.", True, (255, 0, 0))
+		elif curlevel == 1:
+			text_surface = font.render("Did you know that Venus spins counterclockwise?", True, (255, 0, 0))
+
+		text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+		self.display_surface.blit(text_surface, text_rect)
+		pygame.display.flip()  # Update the display
+
 			
 	def check_coin_collisions(self):
 		collided_coins = pygame.sprite.spritecollide(self.player.sprite,self.coin_sprites,True)
@@ -256,11 +312,13 @@ class Level:
 		
 		# sky 
 		self.sky.draw(self.display_surface)
-		self.clouds.draw(self.display_surface,self.world_shift)
-		
-		# background palms
-		self.bg_palm_sprites.update(self.world_shift)
-		self.bg_palm_sprites.draw(self.display_surface) 
+
+		if self.current_level == 0:
+			# Draw clouds and water only for level 0
+			self.clouds.draw(self.display_surface, self.world_shift)
+			self.water.draw(self.display_surface, self.world_shift)
+			self.bg_palm_sprites.update(self.world_shift)
+			self.bg_palm_sprites.draw(self.display_surface)
 
 		# dust particles 
 		self.dust_sprite.update(self.world_shift)
@@ -313,5 +371,11 @@ class Level:
 		self.check_coin_collisions()
 		self.check_enemy_collisions()
 
-		# water 
-		self.water.draw(self.display_surface,self.world_shift)
+		dt = self.clock.tick(60) / 1000.0  # dt in seconds.
+		self.elapsed_time += dt
+
+        # Check if the player is in level 1 and update health
+		if self.current_level == 1:
+			if self.elapsed_time > 1:
+				self.elapsed_time -= 1  # Reset elapsed time
+				self.player.sprite.get_damage()  # Reduce player's health by 1

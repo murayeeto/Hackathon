@@ -4,7 +4,7 @@ from support import import_folder
 from decoration import Sky
 
 class Node(pygame.sprite.Sprite):
-	def __init__(self,pos,status,icon_speed,path):
+	def __init__(self,pos,status,icon_speed,path,layer,node_text=''):
 		super().__init__()
 		self.frames = import_folder(path)
 		self.frame_index = 0
@@ -13,7 +13,14 @@ class Node(pygame.sprite.Sprite):
 			self.status = 'available'
 		else:
 			self.status = 'locked'
+
 		self.rect = self.image.get_rect(center = pos)
+		self.node_text = node_text
+		self.layer = layer
+		self.font = pygame.font.Font(None, 45)  # Set the font for the text
+		self.text_surface = self.font.render(self.node_text, True, (255, 255, 255))  # Render the text surface
+		self.text_rect = self.text_surface.get_rect(center=self.rect.center)
+		self.text_displayed = False	
 
 		self.detection_zone = pygame.Rect(self.rect.centerx-(icon_speed/2),self.rect.centery-(icon_speed/2),icon_speed,icon_speed)
 
@@ -23,6 +30,7 @@ class Node(pygame.sprite.Sprite):
 			self.frame_index = 0
 		self.image = self.frames[int(self.frame_index)]
 
+
 	def update(self):
 		if self.status == 'available':
 			self.animate()
@@ -30,6 +38,13 @@ class Node(pygame.sprite.Sprite):
 			tint_surf = self.image.copy()
 			tint_surf.fill('black',None,pygame.BLEND_RGBA_MULT)
 			self.image.blit(tint_surf,(0,0))
+
+		self.fixed_text_position = (600, 550)
+
+	def draw_text(self, surface, is_selected):
+		if self.status == 'available' and is_selected:
+			fixed_text_rect = self.text_surface.get_rect(center=self.fixed_text_position)
+			surface.blit(self.text_surface, fixed_text_rect)
 
 class Icon(pygame.sprite.Sprite):
 	def __init__(self,pos):
@@ -49,6 +64,7 @@ class Overworld:
 		self.max_level = max_level
 		self.current_level = start_level
 		self.create_level = create_level
+		self.selected_node = None
 
 		# movement logic
 		self.moving = False
@@ -58,7 +74,7 @@ class Overworld:
 		# sprites 
 		self.setup_nodes()
 		self.setup_icon()
-		self.sky = Sky(8,'overworld')
+		self.sky = Sky(8,'../graphics/decoration/sky/space.png')
 
 		# time 
 		self.start_time = pygame.time.get_ticks()
@@ -66,19 +82,17 @@ class Overworld:
 		self.timer_length = 300
 
 	def setup_nodes(self):
-		self.nodes = pygame.sprite.Group()
-
+		self.nodes = pygame.sprite.LayeredUpdates()
 		for index, node_data in enumerate(levels.values()):
-			if index <= self.max_level:
-				node_sprite = Node(node_data['node_pos'],'available',self.speed,node_data['node_graphics'])
-			else:
-				node_sprite = Node(node_data['node_pos'],'locked',self.speed,node_data['node_graphics'])
+			layer = index
+			node_text = node_data.get('node_text', '')
+			node_sprite = Node(node_data['node_pos'], 'available', self.speed, node_data['node_graphics'], layer, node_text)
 			self.nodes.add(node_sprite)
 
 	def draw_paths(self):
 		if self.max_level > 0:
 			points = [node['node_pos'] for index,node in enumerate(levels.values()) if index <= self.max_level]
-			pygame.draw.lines(self.display_surface,'#a04f45',False,points,8)
+			pygame.draw.lines(self.display_surface,'#a04f45',False,points,7)
 
 	def setup_icon(self):
 		self.icon = pygame.sprite.GroupSingle()
@@ -89,16 +103,19 @@ class Overworld:
 		keys = pygame.key.get_pressed()
 
 		if not self.moving and self.allow_input:
-			if keys[pygame.K_RIGHT] and self.current_level < self.max_level:
+			if keys[pygame.K_RIGHT] and self.current_level < self.max_level-1:
 				self.move_direction = self.get_movement_data('next')
 				self.current_level += 1
+				self.selected_node = self.nodes.sprites()[self.current_level]
 				self.moving = True
 			elif keys[pygame.K_LEFT] and self.current_level > 0:
 				self.move_direction = self.get_movement_data('previous')
 				self.current_level -= 1
+				self.selected_node = self.nodes.sprites()[self.current_level]
 				self.moving = True
 			elif keys[pygame.K_SPACE]:
 				self.create_level(self.current_level)
+
 
 	def get_movement_data(self,target):
 		start = pygame.math.Vector2(self.nodes.sprites()[self.current_level].rect.center)
@@ -125,13 +142,24 @@ class Overworld:
 				self.allow_input = True
 
 	def run(self):
+		# Draw text for each node
+
+		self.sky.draw(self.display_surface)
+
+		self.draw_paths()
 		self.input_timer()
 		self.input()
 		self.update_icon_pos()
 		self.icon.update()
 		self.nodes.update()
 
-		self.sky.draw(self.display_surface)
-		self.draw_paths()
+		for node in self.nodes:
+			node.draw_text(self.display_surface, node == self.selected_node)
+		
+		# Draw nodes after text
 		self.nodes.draw(self.display_surface)
+		
 		self.icon.draw(self.display_surface)
+
+		pygame.display.flip()
+

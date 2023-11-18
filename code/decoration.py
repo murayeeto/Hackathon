@@ -5,24 +5,21 @@ from random import choice, randint
 from settings import vertical_tile_number, tile_size, screen_width
 
 class Sky:
-    def __init__(self, horizon, style='level'):
-        self.sky_image = pygame.image.load('../graphics/decoration/sky/space.png').convert()
-        self.horizon = horizon
-
-        # Stretch
-        self.sky_image = pygame.transform.scale(self.sky_image, (screen_width, vertical_tile_number * tile_size))
-
+    def __init__(self, intensity, image_path, style='level'):
+        self.intensity = intensity
+        self.image = pygame.image.load(image_path).convert_alpha()
         self.style = style
-        if self.style == 'overworld':
-            self.palms = []  # Remove the creation of palms
-            self.clouds = []  # Remove the creation of clouds
-
+        # Stretch
+        self.image = pygame.transform.scale(self.image, (screen_width, vertical_tile_number * tile_size))
+ 
     def draw(self, surface):
-        surface.blit(self.sky_image, (0, 0))
+        surface.blit(self.image, (0, 0))
 
         if self.style == 'overworld':
-            # Do not draw palms and clouds
-            pass
+            if self.style == 'overworld':
+                self.palms = []
+                self.clouds = [] 
+
 
 
 class Clouds:

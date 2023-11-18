@@ -10,7 +10,8 @@ level_0 = {
 		'grass': '../levels/0/level_0_grass.csv',
 		'node_pos': (350,400),
 		'unlock': 1,
-		'node_graphics': '../graphics/overworld/0'}
+		'node_graphics': '../graphics/overworld/0',
+        'node_text': "Earth"}
 level_1 = {
 		'terrain': '../levels/1/level_1_terrain.csv',
 		'coins':'../levels/1/level_1_coins.csv',
@@ -23,7 +24,9 @@ level_1 = {
 		'grass': '../levels/1/level_1_grass.csv',
 		'node_pos': (250,400),
 		'node_graphics': '../graphics/overworld/1',
-		'unlock': 2}
+		'unlock': 2,
+        'node_text': "Venus"
+		}
 level_4= {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -36,7 +39,8 @@ level_4= {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (600,400),
 		'node_graphics': '../graphics/overworld/4',
-		'unlock': 3}
+		'unlock': 3,
+        'node_text': "Jupiter"}
 level_2 = {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -49,7 +53,8 @@ level_2 = {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (450,400),
 		'node_graphics': '../graphics/overworld/3',
-		'unlock': 4}
+		'unlock': 4,
+        'node_text': "Mars"}
 level_5 = {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -62,7 +67,8 @@ level_5 = {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (800,400),
 		'node_graphics': '../graphics/overworld/5',
-		'unlock': 5}
+		'unlock': 5,
+        'node_text': "Saturn"}
 level_3= {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -75,7 +81,8 @@ level_3= {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (150,400),
 		'node_graphics':'../graphics/overworld/2',
-		'unlock': 5}
+		'unlock': 5,
+        'node_text': "Mercury"}
 level_6 = {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -88,7 +95,8 @@ level_6 = {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (1000,400),
 		'node_graphics':'../graphics/overworld/6',
-		'unlock': 6}
+		'unlock': 6,
+        'node_text': "Neptune"}
 level_7 = {
 		'terrain': '../levels/2/level_2_terrain.csv',
 		'coins':'../levels/2/level_2_coins.csv',
@@ -101,7 +109,8 @@ level_7 = {
 		'grass': '../levels/2/level_2_grass.csv',
 		'node_pos': (1150,400),
 		'node_graphics':'../graphics/overworld/7',
-		'unlock': 7}
+		'unlock': 7,
+        'node_text': "Uranus"}
 
 levels = {
 	0: level_0,

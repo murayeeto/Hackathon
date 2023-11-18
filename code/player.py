@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 
 		# player movement
 		self.direction = pygame.math.Vector2(0,0)
-		self.speed = 8
+		self.speed = 0
 		self.gravity = 0.8
 		self.jump_speed = -16
 		self.collision_rect = pygame.Rect(self.rect.topleft,(50,self.rect.height))
@@ -115,13 +115,16 @@ class Player(pygame.sprite.Sprite):
 	def get_status(self):
 		if self.direction.y < 0:
 			self.status = 'jump'
+			self.animation_speed = 0.27
 		elif self.direction.y > 1:
 			self.status = 'fall'
 		else:
-			if self.direction.x != 0:
+			if self.direction.x != 0 and self.direction.y == 0:
 				self.status = 'run'
-			else:
+				self.animation_speed = 0.27
+			elif self.direction.x == 0 and self.direction.y ==0:
 				self.status = 'idle'
+				self.animation_speed = 0.27
 
 	def apply_gravity(self):
 		self.direction.y += self.gravity
@@ -137,7 +140,7 @@ class Player(pygame.sprite.Sprite):
 	def get_damage(self):
 		if not self.invincible:
 			self.hit_sound.play()
-			self.change_health(-10)
+			self.change_health(-1)
 			self.invincible = True
 			self.hurt_time = pygame.time.get_ticks()
 
