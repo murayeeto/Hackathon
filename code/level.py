@@ -95,6 +95,8 @@ class Level:
 				return Sky(8, '../graphics/decoration/sky/Venus.png')
 			elif self.current_level == 2:
 				return Sky(8, '../graphics/decoration/sky/Mars.png')
+			elif self.current_level == 3:
+				return Sky(8, '../graphics/decoration/sky/Mercury.png')
 
 	def create_tile_group(self,layout,type):
 		sprite_group = pygame.sprite.Group()
@@ -277,6 +279,10 @@ class Level:
 			text_surface = font.render("We're the third rock from the sun.", True, (255, 0, 0))
 		elif curlevel == 1:
 			text_surface = font.render("Did you know that Venus spins counterclockwise?", True, (255, 0, 0))
+		elif curlevel == 2:
+			text_surface = font.render("Mars and Mercury have almost the exact same gravity despite being different sizes", True, (255, 0, 0))
+		elif curlevel == 3:
+			text_surface = font.render("Mercury is the hottest planet in our solar system. It's also one of the densest", True, (255, 0, 0))
 
 		text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
 		self.display_surface.blit(text_surface, text_rect)
@@ -375,7 +381,7 @@ class Level:
 		self.elapsed_time += dt
 
         # Check if the player is in level 1 and update health
-		if self.current_level == 1:
+		if self.current_level == 1 or self.current_level == 3:
 			if self.elapsed_time > 1:
 				self.elapsed_time -= 1  # Reset elapsed time
 				self.player.sprite.get_damage()  # Reduce player's health by 1
